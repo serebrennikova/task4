@@ -20,7 +20,7 @@ def check_cache():
 def get_google_answer():
     global dns_cache
     data, address = server_receive_socket.recvfrom(1024)
-    print('ANSWER ')
+    print('GOOGLE ANSWER ')
     answer = dnslib.DNSRecord.parse(data)
     print(answer)
     for element in answer.rr:
@@ -57,27 +57,24 @@ try:
             except OSError:
                 pass
             if data:
-                ans_rec = None
                 info = dnslib.DNSRecord.parse(data)
-                reansw = []
-                for que in info.questions:
-                    if que.qname in dns_cache and que.qtype in dns_cache[que.qname]:
-                        s, end = dns_cache[que.qname][que.qtype]
-                        print('Record ' + str(que.qname) + ' type ' + str(que.qtype) + ' date ' + str(time.ctime(end)))
-                        print("From cash:")
+                date_from_cache = []
+                for element in info.questions:
+                    if element.qname in dns_cache and element.qtype in dns_cache[element.qname]:
+                        s, end = dns_cache[element.qname][element.qtype]
+                        print('RECORD ' + str(element.qname) + ' TYPE ' + str(element.qtype) + ' DATE ' + str(time.ctime(end)))
+                        print("FROM CACHE:")
                         print(s)
-                        reansw.append(que)
+                        date_from_cache.append(element)
                     else:
-                        print('Record ' + str(que.qname) + ' type ' + str(que.qtype))
-                for que in reansw:
-                    info.questions.remove(que)
+                        print('RECORD ' + str(element.qname) + ' TYPE ' + str(element.qtype))
+                for element in date_from_cache:
+                    info.questions.remove(element)
                 if info.questions:
-                    ans_rec = info
-                if ans_rec:
                     try:
-                        server = ('8.8.4.4', 53)
-                        server_receive_socket.sendto(ans_rec.pack(), server)
-                        print('Request ' + str(server[0]) + ":" + str(server[1]))
+                        server = ('8.8.8.8', 53)
+                        server_receive_socket.sendto(info.pack(), server)
+                        print('REQUEST ' + str(server[0]) + ":" + str(server[1]))
                     except OSError:
                         pass
         except OSError:
